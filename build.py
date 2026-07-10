@@ -29,6 +29,46 @@ sys.path.pop(0)
 _ROOT_DIR = Path(__file__).resolve().parent
 _PATCH_BIN_RELPATH = Path('third_party/git/usr/bin/patch.exe')
 
+# Chromium Web Store extension (https://github.com/NeverDecaf/chromium-web-store)
+# Bundled as an external extension; loaded by the bundled-external-extensions
+# patch from the "Extensions" directory next to chrome.dll.
+_CWS_ID = 'ocaahdebbfolfmndjeplogmgcagdmblk'
+_CWS_VERSION = '1.5.5.3'
+_CWS_URL = ('https://github.com/NeverDecaf/chromium-web-store/releases/download/'
+            'v{}/Chromium.Web.Store.crx'.format(_CWS_VERSION))
+_CWS_SHA256 = '326443baec3d204b1358eba6aa025cf6bd930c08a0b98f6784e7a3236528445b'
+
+
+def _stage_bundled_extensions(source_tree):
+    """
+    Downloads the Chromium Web Store crx and stages it, along with the
+    external_extensions.json manifest, into out/Default/Extensions so that
+    both the installer (via chrome.release) and the zip (via package.py)
+    pick it up.
+    """
+    import hashlib
+    import json
+    import urllib.request
+    ext_dir = source_tree / 'out' / 'Default' / 'Extensions'
+    ext_dir.mkdir(parents=True, exist_ok=True)
+    crx_path = ext_dir / 'chromium_web_store.crx'
+    if not crx_path.exists():
+        get_logger().info('Downloading Chromium Web Store extension...')
+        with urllib.request.urlopen(_CWS_URL) as response:
+            data = response.read()
+        if hashlib.sha256(data).hexdigest() != _CWS_SHA256:
+            raise RuntimeError('Chromium Web Store crx checksum mismatch')
+        crx_path.write_bytes(data)
+    (ext_dir / 'external_extensions.json').write_text(
+        json.dumps(
+            {
+                _CWS_ID: {
+                    'external_crx': crx_path.name,
+                    'external_version': _CWS_VERSION,
+                }
+            }, indent=2),
+        encoding=ENCODING)
+
 
 def _get_vcvars_path(name='64'):
     """
@@ -286,6 +326,9 @@ def main():
             windows_flags += '\nchrome_pgo_phase=0\n'
         gn_flags += windows_flags
         (source_tree / 'out/Default/args.gn').write_text(gn_flags, encoding=ENCODING)
+
+    # Stage bundled extensions (Chromium Web Store) into out/Default/Extensions
+    _stage_bundled_extensions(source_tree)
 
     # Enter source tree to run build commands
     os.chdir(source_tree)

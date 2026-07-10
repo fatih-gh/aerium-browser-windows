@@ -1,6 +1,11 @@
-# ungoogled-chromium-windows
+# ungoogled-chromium-windows (fatih-gh fork)
 
 Windows packaging for [ungoogled-chromium](//github.com/Eloston/ungoogled-chromium).
+
+## Fork changes
+
+- **Bundled [Chromium Web Store](https://github.com/NeverDecaf/chromium-web-store) extension**: the signed crx is downloaded at build time (`build.py`), staged into `out/Default/Extensions`, shipped in both the installer and the portable zip, and auto-installed enabled on first run via `patches/ungoogled-fatih/bundled-external-extensions.patch` (external-extension provider re-enabled on Windows, auto-acknowledged so there is no install prompt). It behaves like a regular extension: visible in `chrome://extensions`, can be disabled or removed, and self-updates from its GitHub `update_url`.
+- **Recommended flags enabled by default** (`patches/ungoogled-fatih/default-flags.patch`): `disable-search-engine-collection`, `enable-parallel-downloading`, `extension-mime-request-handling` (always prompt), canvas/client-rects/measuretext fingerprinting noise, `force-punycode-hostnames`, `increase-incognito-storage-quota`, `minimal-referrers`, `popups-to-tabs`, `reduced-system-info`, `remove-client-hints`, `remove-tabsearch-button`, `show-avatar-button` (incognito/guest only), `spoof-webgl-info`. These are pref *defaults*: changing any flag in `chrome://flags` writes the user's own list to `Local State` as usual.
 
 ## Downloads
 

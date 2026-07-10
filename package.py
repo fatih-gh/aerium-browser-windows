@@ -86,8 +86,12 @@ def main():
     files_generator = filescfg.filescfg_generator(
         Path('build/src/chrome/tools/build/win/FILES.cfg'),
         build_outputs, args.cpu_arch, excluded_files)
+    # Include bundled extensions (Chromium Web Store) in the portable zip;
+    # the installer already picks them up via chrome.release.
+    extensions_dir = build_outputs / 'Extensions'
+    include_paths = (extensions_dir,) if extensions_dir.exists() else tuple()
     filescfg.create_archive(
-        files_generator, tuple(), build_outputs, output, timestamp)
+        files_generator, include_paths, build_outputs, output, timestamp)
 
 if __name__ == '__main__':
     main()
