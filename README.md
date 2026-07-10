@@ -1,9 +1,10 @@
-# ungoogled-chromium-windows (fatih-gh fork)
+# Aerium (ungoogled-chromium-windows fork)
 
-Windows packaging for [ungoogled-chromium](//github.com/Eloston/ungoogled-chromium).
+Windows packaging for [ungoogled-chromium](//github.com/Eloston/ungoogled-chromium), rebranded as **Aerium**.
 
 ## Fork changes
 
+- **Aerium branding** (`_apply_branding` in `build.py`): product name, UI strings in all locales, shortcut/installer names, ProgIDs, registry paths and the user data directory (`%LOCALAPPDATA%\Aerium`) are renamed from Chromium to Aerium; app icon, product logos and start-menu tiles are replaced with the Aerium logo (pre-rendered from `logo.svg` into `brand/`). Package filenames are `aerium_*` accordingly. The x86/arm and winget/binaries publishing jobs were dropped from `publish-release.yml` (x64 only).
 - **Bundled [Chromium Web Store](https://github.com/NeverDecaf/chromium-web-store) extension**: the signed crx is downloaded at build time (`build.py`), staged into `out/Default/Extensions`, shipped in both the installer and the portable zip, and auto-installed enabled on first run via `patches/ungoogled-fatih/bundled-external-extensions.patch` (external-extension provider re-enabled on Windows, auto-acknowledged so there is no install prompt). It behaves like a regular extension: visible in `chrome://extensions`, can be disabled or removed, and self-updates from its GitHub `update_url`.
 - **Recommended flags enabled by default** (`patches/ungoogled-fatih/default-flags.patch`): `disable-search-engine-collection`, `enable-parallel-downloading`, `extension-mime-request-handling` (always prompt), canvas/client-rects/measuretext fingerprinting noise, `force-punycode-hostnames`, `increase-incognito-storage-quota`, `minimal-referrers`, `popups-to-tabs`, `reduced-system-info`, `remove-client-hints`, `remove-tabsearch-button`, `show-avatar-button` (incognito/guest only), `spoof-webgl-info`. These are pref *defaults*: changing any flag in `chrome://flags` writes the user's own list to `Local State` as usual.
 

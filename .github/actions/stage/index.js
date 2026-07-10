@@ -43,7 +43,7 @@ async function run() {
     });
     if (retCode === 0) {
         core.setOutput('finished', true);
-        const globber = await glob.create('C:\\ungoogled-chromium-windows\\build\\ungoogled-chromium*',
+        const globber = await glob.create('C:\\ungoogled-chromium-windows\\build\\aerium*',
             {matchDirectories: false});
         let packageList = await globber.glob();
         const finalArtifactName = x86 ? 'chromium-x86' : (arm ? 'chromium-arm' : 'chromium');

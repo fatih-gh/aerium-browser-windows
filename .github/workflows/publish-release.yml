@@ -4,8 +4,6 @@ on:
   workflow_run:
     workflows:
       - build-x64
-      - build-x86
-      - build-arm
     types:
       - completed
 
@@ -27,8 +25,6 @@ jobs:
       target_tag: ${{ steps.context.outputs.target_tag }}
       target_sha: ${{ steps.context.outputs.target_sha }}
       x64_run_id: ${{ steps.runs.outputs.x64_run_id }}
-      x86_run_id: ${{ steps.runs.outputs.x86_run_id }}
-      arm_run_id: ${{ steps.runs.outputs.arm_run_id }}
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -101,8 +97,6 @@ jobs:
           script: |
             const workflows = [
               { key: 'x64', file: 'build-x64.yml' },
-              { key: 'x86', file: 'build-x86.yml' },
-              { key: 'arm', file: 'build-arm.yml' },
             ];
             const targetSha = process.env.TARGET_SHA;
             const outputs = { publishable: 'true' };
@@ -160,24 +154,6 @@ jobs:
           repository: ${{ github.repository }}
           run-id: ${{ needs.resolve-release-context.outputs.x64_run_id }}
 
-      - name: Download x86 package
-        uses: actions/download-artifact@v8
-        with:
-          name: chromium-x86
-          path: artifacts/x86
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          run-id: ${{ needs.resolve-release-context.outputs.x86_run_id }}
-
-      - name: Download arm package
-        uses: actions/download-artifact@v8
-        with:
-          name: chromium-arm
-          path: artifacts/arm
-          github-token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          run-id: ${{ needs.resolve-release-context.outputs.arm_run_id }}
-
       - name: Publish release
         uses: softprops/action-gh-release@v3
         with:
@@ -185,80 +161,4 @@ jobs:
           fail_on_unmatched_files: true
           overwrite_files: true
           files: |
-            artifacts/**/ungoogled-chromium*
-
-  publish-winget:
-    needs:
-      - resolve-release-context
-      - publish-release
-    if: ${{ needs.resolve-release-context.outputs.ready == 'true' && needs.resolve-release-context.outputs.publishable == 'true' }}
-    runs-on: ubuntu-slim
-    steps:
-      - name: Get version
-        id: version
-        run: echo "version=$(echo '${{ needs.resolve-release-context.outputs.target_tag }}' | cut -d'-' -f1)" >> $GITHUB_OUTPUT
-      - uses: vedantmgoyal9/winget-releaser@main
-        with:
-          identifier: eloston.ungoogled-chromium
-          token: ${{ secrets.PAT }}
-          installers-regex: .(exe|zip)$
-          version: ${{ steps.version.outputs.version }}
-          release-tag: ${{ needs.resolve-release-context.outputs.target_tag }}
-          fork-user: Nifury
-
-  update-binaries:
-    needs:
-      - resolve-release-context
-      - publish-release
-    if: ${{ needs.resolve-release-context.outputs.ready == 'true' && needs.resolve-release-context.outputs.publishable == 'true' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout ungoogled-chromium-windows
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ needs.resolve-release-context.outputs.target_tag }}
-          path: ungoogled-chromium-windows
-      - name: Checkout ungoogled-chromium-binaries
-        uses: actions/checkout@v7
-        with:
-          repository: Nifury/ungoogled-chromium-binaries
-          token: ${{ secrets.PAT }}
-          path: ungoogled-chromium-binaries
-      - name: Rebase onto upstream master
-        working-directory: ungoogled-chromium-binaries
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git remote add upstream https://github.com/ungoogled-software/ungoogled-chromium-binaries.git
-          git fetch upstream
-          git rebase upstream/master
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.12'
-      - name: Install dependencies
-        run: pip install requests
-      - name: Run gen.py
-        working-directory: ungoogled-chromium-binaries
-        env:
-          RELEASE_TAG: ${{ needs.resolve-release-context.outputs.target_tag }}
-        run: python ../ungoogled-chromium-windows/.github/scripts/gen.py
-      - name: Commit and push
-        working-directory: ungoogled-chromium-binaries
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add config/platforms/windows/
-          git commit -m "Update Windows binaries for ${{ needs.resolve-release-context.outputs.target_tag }}"
-          git push --force-with-lease
-      - name: Create pull request
-        working-directory: ungoogled-chromium-binaries
-        run: |
-          gh pr create \
-            --repo ungoogled-software/ungoogled-chromium-binaries \
-            --head Nifury:master \
-            --base master \
-            --title "Update Windows binaries for ${{ needs.resolve-release-context.outputs.target_tag }}" \
-            --body "Automated update of Windows binary hashes for release ${{ needs.resolve-release-context.outputs.target_tag }}."
-        env:
-          GH_TOKEN: ${{ secrets.PAT }}
+            artifacts/**/aerium*

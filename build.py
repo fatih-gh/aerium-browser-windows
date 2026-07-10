@@ -29,6 +29,51 @@ sys.path.pop(0)
 _ROOT_DIR = Path(__file__).resolve().parent
 _PATCH_BIN_RELPATH = Path('third_party/git/usr/bin/patch.exe')
 
+# Browser brand name (replaces "Chromium" in product name, UI strings,
+# shortcuts, registry paths and the user data directory)
+_BRAND_NAME = 'Aerium'
+
+
+def _apply_branding(source_tree):
+    """Renames Chromium to Aerium and swaps in the Aerium logo assets"""
+    get_logger().info('Applying %s branding...', _BRAND_NAME)
+
+    # BRANDING: product and installer names (company/copyright left intact)
+    branding_path = source_tree / 'chrome' / 'app' / 'theme' / 'chromium' / 'BRANDING'
+    branding_lines = []
+    for line in branding_path.read_text(encoding=ENCODING).splitlines():
+        if line.startswith('PRODUCT_'):
+            line = line.replace('Chromium', _BRAND_NAME)
+        branding_lines.append(line)
+    branding_path.write_text('\n'.join(branding_lines) + '\n', encoding=ENCODING)
+
+    # Product name in UI strings (all locales), installer strings and
+    # install-mode constants (shortcut name, ProgIDs, registry paths,
+    # user data directory)
+    rename_files = [
+        source_tree / 'chrome' / 'app' / 'chromium_strings.grd',
+        source_tree / 'components' / 'components_chromium_strings.grd',
+        source_tree / 'chrome' / 'install_static' / 'chromium_install_modes.h',
+    ]
+    rename_files += sorted(
+        (source_tree / 'chrome' / 'app' / 'resources').glob('chromium_strings_*.xtb'))
+    rename_files += sorted(
+        (source_tree / 'components' / 'strings').glob('components_chromium_strings_*.xtb'))
+    for rename_path in rename_files:
+        text = rename_path.read_text(encoding='utf-8')
+        rename_path.write_text(text.replace('Chromium', _BRAND_NAME), encoding='utf-8')
+
+    # Logo assets
+    brand_dir = _ROOT_DIR / 'brand'
+    theme_dir = source_tree / 'chrome' / 'app' / 'theme' / 'chromium'
+    shutil.copyfile(brand_dir / 'aerium.ico', theme_dir / 'win' / 'chromium.ico')
+    shutil.copyfile(brand_dir / 'product_logo.svg', theme_dir / 'product_logo.svg')
+    for png_path in brand_dir.glob('product_logo_*.png'):
+        shutil.copyfile(png_path, theme_dir / png_path.name)
+    for tile_path in (brand_dir / 'tiles').iterdir():
+        shutil.copyfile(tile_path, theme_dir / 'win' / 'tiles' / tile_path.name)
+
+
 # Chromium Web Store extension (https://github.com/NeverDecaf/chromium-web-store)
 # Bundled as an external extension; loaded by the bundled-external-extensions
 # patch from the "Extensions" directory next to chrome.dll.
@@ -275,6 +320,9 @@ def main():
             source_tree,
             None
         )
+
+        # Apply Aerium branding
+        _apply_branding(source_tree)
 
     # Check if rust-toolchain folder has been populated
     HOST_CPU_IS_64BIT = sys.maxsize > 2**32
