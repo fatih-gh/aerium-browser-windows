@@ -1,0 +1,56 @@
+# Updating Aerium (Windows)
+
+How to move Aerium onto a newer Chromium release when the **Upstream
+watch** workflow opens a tracking issue.
+
+## Where things live
+
+- **Base**: `ungoogled-chromium` submodule + this repo's Windows
+  packaging (fork of `ungoogled-software/ungoogled-chromium-windows`).
+  Chromium version is in `ungoogled-chromium/chromium_version.txt`.
+- **Our changes**: `_apply_branding` in `build.py` (Chromium→Aerium,
+  Dioide, logo swap), `patches/ungoogled-fatih/` (default-flags,
+  bundled-external-extensions, aerium-theme), `brand/` (logo assets),
+  the staged workflow under `.github/`.
+
+## Sync procedure
+
+Upstream (ungoogled-software) uses normal PRs, so a merge is safe here.
+
+1. `git remote add upstream https://github.com/ungoogled-software/ungoogled-chromium-windows.git` (once)
+2. `git fetch upstream && git merge upstream/master`
+3. Resolve conflicts. Our files most likely to conflict: `build.py`
+   (keep `_apply_branding` and the extension staging), `package.py`
+   (keep `aerium_*` names + Extensions include), `.github/workflows/`
+   (ours is a distinct staged pipeline — usually keep ours).
+4. Bump the submodule if the merge didn't:
+   `git -C ungoogled-chromium fetch --tags && git -C ungoogled-chromium checkout <tag>`.
+5. Verify our three patches still apply against the new Chromium:
+   ```
+   # in a scratch checkout of the new chromium source
+   patch -p1 --dry-run < patches/ungoogled-fatih/default-flags.patch
+   patch -p1 --dry-run < patches/ungoogled-fatih/bundled-external-extensions.patch
+   patch -p1 --dry-run < patches/ungoogled-fatih/aerium-theme.patch
+   ```
+6. Commit and dispatch **build-x64**.
+
+## When a patch fails to apply
+
+Our three patches target specific Chromium files that occasionally move:
+
+- `default-flags.patch` → `components/webui/flags/pref_service_flags_storage.cc`
+- `bundled-external-extensions.patch` → `chrome/browser/extensions/external_provider_impl.cc`
+- `aerium-theme.patch` → `chrome/browser/themes/theme_service.cc`
+
+If `--dry-run` reports a hunk failure, open the target file at the new
+Chromium tag on
+`https://chromium.googlesource.com/chromium/src/+/refs/tags/<version>/<path>`,
+find the moved code, and regenerate the patch against it. The
+`_apply_branding` string sweep in `build.py` is version-tolerant (it
+greps for "Chromium" across grd/grdp/xtb) and rarely needs changes.
+
+## Chrome Web Store crx pin
+
+`build.py` pins the bundled extension by version + sha256
+(`_CWS_VERSION`, `_CWS_SHA256`). If NeverDecaf/chromium-web-store
+releases a new version, update both or the download check will fail.
