@@ -16,7 +16,8 @@ A deep-navy, space-themed [ungoogled-chromium](https://github.com/ungoogled-soft
 ## What's different from stock ungoogled-chromium
 
 - **Full Aerium identity**: product name, every UI string that mentions the browser by name, icons, installer, start-menu tiles, and the user data directory (`%LOCALAPPDATA%\Aerium`) are all rebranded — no leftover "Chromium" anywhere in the UI.
-- **Space-navy theme by default**: dark UI with a navy seed color, so the browser looks like Aerium out of the box instead of needing manual setup.
+- **Space-navy theme by default**: dark UI with a navy seed color and hand-picked shell colors (frame, toolbar, tab strip) for a distinct, branded look, not just a stock Chromium dark mode.
+- **A custom New Tab Page**: a clean, sleek space scene — live clock, greeting, search, and shortcuts over an animated starfield — instead of the stock Google-tiles page.
 - **[Chromium Web Store](https://github.com/NeverDecaf/chromium-web-store) bundled and pre-installed**, so the Chrome Web Store works for installing and auto-updating extensions without any extra steps.
 - **A curated set of privacy flags enabled by default** — canvas/client-rects/measuretext fingerprinting noise, reduced system info, spoofed WebGL info, forced punycode hostnames, parallel downloading, and a few others (see `patches/ungoogled-fatih/default-flags.patch` for the exact list). These are pref *defaults*, not locked-in: anything you change in `chrome://flags` behaves normally afterward.
 - Widevine DRM stays off, consistent with upstream ungoogled-chromium's philosophy.
