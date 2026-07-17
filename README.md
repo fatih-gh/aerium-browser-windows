@@ -18,6 +18,7 @@ Aerium is a browser for people who'd rather their browser stayed out of the way.
 - **A browser that looks like Aerium, not like a rebadged default.** Frame, toolbar, and tab strip carry their own deep-navy palette, not just a dark-mode filter over stock Chromium.
 - **Extensions that work out of the box.** The Chrome Web Store is available from the first launch — install and update the same way you would anywhere else.
 - **Privacy defaults you don't have to hunt for.** Fingerprinting resistance, minimal referrers, reduced system info, and a handful of others are on from the start. Nothing's locked — change any of it in `chrome://flags` and it behaves like flags always have.
+- **HTTPS by default.** Balanced Mode upgrades navigations to HTTPS automatically, without the disruptive full-site warnings of strict HTTPS-only enforcement.
 - **A first-run page that's actually useful.** Recommendations for an ad blocker, a bookmark sync tool, and a new-tab replacement — all free and open-source, none of them installed for you.
 - **Lighter by default.** Memory Saver and Battery Saver are on out of the box, and a handful of background network chatter — hint prefetching, domain reliability pings — is off. The name comes from aerogel, the lightest solid there is.
 - **DRM off.** Widevine stays disabled.
