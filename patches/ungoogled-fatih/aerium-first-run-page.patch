@@ -14,7 +14,7 @@
  #include "content/public/browser/url_data_source.h"
  #include "content/public/browser/web_ui.h"
  #include "content/public/browser/web_ui_controller.h"
-@@ -25,51 +30,132 @@
+@@ -25,51 +30,138 @@
                          const content::WebContents::Getter& wc_getter,
                          GotDataCallback callback) {
      std::string source = R"(
@@ -169,11 +169,17 @@
 + same way you would in Chrome, updates included.
 +</section>
 +<section>
++ <h2>Updates</h2><p>
++ Aerium doesn't check for updates on its own &mdash; there's no background process phoning home to do it.
++ <a href="https://github.com/fatih-gh/aerium-browser-windows/releases/latest">Check the latest release on GitHub</a>
++ when you want to see if a newer build is out.
++</section>
++<section>
 + <h2>Spellcheck dictionaries</h2>
   <details><summary><b>Enable spellcheck</b></summary>
    <ol>
     <li>Go to <a href="https://chromium.googlesource.com/chromium/deps/hunspell_dictionaries/+/main">
-@@ -82,34 +168,24 @@
+@@ -82,34 +174,24 @@
     <li>This is a base64-encoded file that needs to be decoded. Use the button below to select the .txt file you saved
      and save/move the resulting bdic file to your Dictionaries directory. Default locations:
      <ul>
@@ -221,7 +227,7 @@
  </section>
  <script>
   document.getElementById("bdic").onchange = function(e){
-@@ -120,6 +196,28 @@
+@@ -120,6 +202,28 @@
     a.setAttribute("download", e.target.files[0].name.replace(/\.[^/.]+$/, ".bdic"));
     a.click()
    }, f.readAsText(this.files[0])};
@@ -250,7 +256,7 @@
  </script>
  )";
      std::move(callback).Run(base::MakeRefCounted<base::RefCountedString>(std::move(source)));
-@@ -136,9 +234,28 @@
+@@ -136,9 +240,28 @@
   public:
    UngoogledFirstRun(content::WebUI* web_ui) : content::WebUIController(web_ui) {
      content::URLDataSource::Add(Profile::FromWebUI(web_ui), std::make_unique<UFRDataSource>());
