@@ -23,8 +23,7 @@
  <meta name="color-scheme" content="light dark">
  <style>
   @import url(chrome://resources/css/text_defaults_md.css);
-- html{color:#202124; background:white; line-height:1.1em}
-+ html{color:#202124; background:#f4f6fb; line-height:1.1em}
+  html{color:#202124; background:white; line-height:1.1em}
   a{color:#1967d2}
 - h2{margin:0; padding:0.67em 1.33em}
 + h2{margin:0; padding:0.67em 1.33em; display:flex; align-items:center; gap:.5em}
@@ -48,12 +47,10 @@
 + #dnsApply:hover{background:#1a56b0}
 + #dnsStatus{padding:0 2em 1em; font-size:.9em; color:#188038; min-height:1.2em}
   @media(prefers-color-scheme:dark){
--  html{color:#e8eaed; background:#202124}
-+  html{color:#e8eaed; background:#0e1531}
+   html{color:#e8eaed; background:#202124}
    a{color:#8ab4f8}
    p,details{border-top:.063em solid #3f4042}
--  section{background:#292a2d; box-shadow:0 .063em .125em 0 #161719, 0 .125em .375em .125em #1b1c1f}
-+  section{background:#151f3e; box-shadow:0 .063em .125em 0 #080d1e, 0 .125em .375em .125em #0b1026}
+   section{background:#292a2d; box-shadow:0 .063em .125em 0 #161719, 0 .125em .375em .125em #1b1c1f}
 +  .cards{border-top:.063em solid #3f4042}
 +  .card{border-color:#3f4042}
 +  .card p{color:#9aa0a6}
