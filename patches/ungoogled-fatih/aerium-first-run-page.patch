@@ -14,7 +14,7 @@
  #include "content/public/browser/url_data_source.h"
  #include "content/public/browser/web_ui.h"
  #include "content/public/browser/web_ui_controller.h"
-@@ -25,51 +30,117 @@
+@@ -25,51 +30,122 @@
                          const content::WebContents::Getter& wc_getter,
                          GotDataCallback callback) {
      std::string source = R"(
@@ -116,6 +116,11 @@
 +   <p>A customisable new tab page &mdash; backgrounds, widgets, and a calmer default tab.</p>
 +   <a href="https://chromewebstore.google.com/detail/tablissng/dlaogejjiafeobgofajdlkkhjlignalk">Get it from the Chrome Web Store</a>
 +  </div>
++  <div class="card">
++   <h3>Cookie AutoDelete V3</h3>
++   <p>Clears a site's cookies once you close its tabs, with a whitelist for the ones you want to keep.</p>
++   <a href="https://chromewebstore.google.com/detail/cookie-autodelete-v3/jofioghmpdcgiiobkhmdojhjbjiejfbd">Get it from the Chrome Web Store</a>
++  </div>
 + </div>
 +</section>
 +<section>
@@ -158,7 +163,7 @@
   <details><summary><b>Enable spellcheck</b></summary>
    <ol>
     <li>Go to <a href="https://chromium.googlesource.com/chromium/deps/hunspell_dictionaries/+/main">
-@@ -82,34 +153,21 @@
+@@ -82,34 +158,21 @@
     <li>This is a base64-encoded file that needs to be decoded. Use the button below to select the .txt file you saved
      and save/move the resulting bdic file to your Dictionaries directory. Default locations:
      <ul>
@@ -203,7 +208,7 @@
  </section>
  <script>
   document.getElementById("bdic").onchange = function(e){
-@@ -120,6 +178,27 @@
+@@ -120,6 +183,27 @@
     a.setAttribute("download", e.target.files[0].name.replace(/\.[^/.]+$/, ".bdic"));
     a.click()
    }, f.readAsText(this.files[0])};
@@ -231,7 +236,7 @@
  </script>
  )";
      std::move(callback).Run(base::MakeRefCounted<base::RefCountedString>(std::move(source)));
-@@ -136,9 +215,28 @@
+@@ -136,9 +220,28 @@
   public:
    UngoogledFirstRun(content::WebUI* web_ui) : content::WebUIController(web_ui) {
      content::URLDataSource::Add(Profile::FromWebUI(web_ui), std::make_unique<UFRDataSource>());
