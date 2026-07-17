@@ -14,7 +14,7 @@
  #include "content/public/browser/url_data_source.h"
  #include "content/public/browser/web_ui.h"
  #include "content/public/browser/web_ui_controller.h"
-@@ -25,51 +30,122 @@
+@@ -25,51 +30,127 @@
                          const content::WebContents::Getter& wc_getter,
                          GotDataCallback callback) {
      std::string source = R"(
@@ -136,7 +136,7 @@
 +  <div class="dns-option">
 +   <input type="radio" name="dns" id="dns-cloudflare" value="cloudflare" checked>
 +   <label for="dns-cloudflare">Cloudflare</label>
-+   <span>Independently audited no-log policy, generally the fastest of the three.</span>
++   <span>Independently audited no-log policy, generally the fastest of the four.</span>
 +  </div>
 +  <div class="dns-option">
 +   <input type="radio" name="dns" id="dns-quad9" value="quad9">
@@ -147,6 +147,11 @@
 +   <input type="radio" name="dns" id="dns-nextdns" value="nextdns">
 +   <label for="dns-nextdns">NextDNS</label>
 +   <span>Anonymous shared endpoint; a free NextDNS account unlocks per-device filtering.</span>
++  </div>
++  <div class="dns-option">
++   <input type="radio" name="dns" id="dns-mullvad" value="mullvad">
++   <label for="dns-mullvad">Mullvad</label>
++   <span>Run by the VPN provider, unfiltered, no logging by policy.</span>
 +  </div>
 + </div>
 + <button id="dnsApply">Apply</button>
@@ -163,7 +168,7 @@
   <details><summary><b>Enable spellcheck</b></summary>
    <ol>
     <li>Go to <a href="https://chromium.googlesource.com/chromium/deps/hunspell_dictionaries/+/main">
-@@ -82,34 +158,21 @@
+@@ -82,34 +163,21 @@
     <li>This is a base64-encoded file that needs to be decoded. Use the button below to select the .txt file you saved
      and save/move the resulting bdic file to your Dictionaries directory. Default locations:
      <ul>
@@ -208,7 +213,7 @@
  </section>
  <script>
   document.getElementById("bdic").onchange = function(e){
-@@ -120,6 +183,27 @@
+@@ -120,6 +188,28 @@
     a.setAttribute("download", e.target.files[0].name.replace(/\.[^/.]+$/, ".bdic"));
     a.click()
    }, f.readAsText(this.files[0])};
@@ -216,7 +221,8 @@
 + var AERIUM_DNS_TEMPLATES = {
 +  cloudflare: "https://chrome.cloudflare-dns.com/dns-query",
 +  quad9: "https://dns.quad9.net/dns-query",
-+  nextdns: "https://chromium.dns.nextdns.io"
++  nextdns: "https://chromium.dns.nextdns.io",
++  mullvad: "https://dns.mullvad.net/dns-query"
 + };
 + document.getElementById("dnsApply").onclick = function(){
 +  var choice = document.querySelector('input[name="dns"]:checked').value;
@@ -236,7 +242,7 @@
  </script>
  )";
      std::move(callback).Run(base::MakeRefCounted<base::RefCountedString>(std::move(source)));
-@@ -136,9 +220,28 @@
+@@ -136,9 +226,28 @@
   public:
    UngoogledFirstRun(content::WebUI* web_ui) : content::WebUIController(web_ui) {
      content::URLDataSource::Add(Profile::FromWebUI(web_ui), std::make_unique<UFRDataSource>());
