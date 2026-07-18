@@ -14,7 +14,7 @@
  #include "content/public/browser/url_data_source.h"
  #include "content/public/browser/web_ui.h"
  #include "content/public/browser/web_ui_controller.h"
-@@ -25,51 +30,138 @@
+@@ -25,51 +30,150 @@
                          const content::WebContents::Getter& wc_getter,
                          GotDataCallback callback) {
      std::string source = R"(
@@ -35,9 +35,16 @@
   section{width:60em; margin:4em auto; border-radius:.5em;
           background:white; box-shadow:0 .063em .125em 0 #c4c5c6, 0 .125em .375em .125em #e2e3e3}
 + .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(15em,1fr)); gap:1em; padding:1em 2em; border-top:.063em solid #f0f0f0}
-+ .card{border:.063em solid #dadce0; border-radius:.5em; padding:1em}
++ .card{border:.063em solid #dadce0; border-radius:.5em; padding:1em; position:relative}
 + .card h3{margin:0 0 .3em; font-size:1em}
 + .card p{border:none; padding:0; margin:0 0 .7em; font-size:.9em; color:#5f6368}
++ .card-featured{border-color:#1967d2; border-width:.125em}
++ .card-badge{position:absolute; top:-.7em; right:1em; background:#1967d2; color:white;
++   font-size:.75em; padding:.1em .6em; border-radius:1em}
++ .card-cta{display:inline-block; padding:.4em 1em; border-radius:1.2em;
++   background:#1967d2; color:white; font-size:.9em}
++ .card-cta:hover{background:#1a56b0}
++ .card a:not(.card-cta){font-size:.9em}
 + .dns-options{display:flex; flex-direction:column; gap:.5em; padding:1em 2em; border-top:.063em solid #f0f0f0}
 + .dns-option{display:flex; align-items:baseline; gap:.6em}
 + .dns-option label{font-weight:500}
@@ -54,6 +61,10 @@
 +  .cards{border-top:.063em solid #3f4042}
 +  .card{border-color:#3f4042}
 +  .card p{color:#9aa0a6}
++  .card-featured{border-color:#8ab4f8}
++  .card-badge{background:#8ab4f8; color:#202124}
++  .card-cta{background:#8ab4f8; color:#202124}
++  .card-cta:hover{background:#aecbfa}
 +  .dns-options{border-top:.063em solid #3f4042}
 +  .dns-option span{color:#9aa0a6}
 +  #dnsStatus{color:#81c995}
@@ -93,10 +104,11 @@
 + None of these are installed automatically &mdash; they're just tools we think are worth knowing about.
 + Every one is free, open-source, and independently maintained.
 + <div class="cards">
-+  <div class="card">
++  <div class="card card-featured">
++   <span class="card-badge">Recommended</span>
 +   <h3>uBlock Origin</h3>
 +   <p>Efficient, open-source content blocking.</p>
-+   <a href="https://chromewebstore.google.com/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm">Get it from the Chrome Web Store</a>
++   <a class="card-cta" href="https://chromewebstore.google.com/detail/ublock-origin/cjpalhdlnbpafiamejdnhcphjbkeiagm">Install uBlock Origin</a>
 +  </div>
 +  <div class="card">
 +   <h3>uBlock Origin Lite</h3>
@@ -176,7 +188,7 @@
   <details><summary><b>Enable spellcheck</b></summary>
    <ol>
     <li>Go to <a href="https://chromium.googlesource.com/chromium/deps/hunspell_dictionaries/+/main">
-@@ -82,34 +174,24 @@
+@@ -82,34 +186,24 @@
     <li>This is a base64-encoded file that needs to be decoded. Use the button below to select the .txt file you saved
      and save/move the resulting bdic file to your Dictionaries directory. Default locations:
      <ul>
@@ -224,7 +236,7 @@
  </section>
  <script>
   document.getElementById("bdic").onchange = function(e){
-@@ -120,6 +202,28 @@
+@@ -120,6 +214,28 @@
     a.setAttribute("download", e.target.files[0].name.replace(/\.[^/.]+$/, ".bdic"));
     a.click()
    }, f.readAsText(this.files[0])};
@@ -253,7 +265,7 @@
  </script>
  )";
      std::move(callback).Run(base::MakeRefCounted<base::RefCountedString>(std::move(source)));
-@@ -136,9 +240,28 @@
+@@ -136,9 +252,28 @@
   public:
    UngoogledFirstRun(content::WebUI* web_ui) : content::WebUIController(web_ui) {
      content::URLDataSource::Add(Profile::FromWebUI(web_ui), std::make_unique<UFRDataSource>());
