@@ -51,10 +51,27 @@ async function run() {
         cwd: 'C:\\ungoogled-chromium-windows',
         ignoreReturnCode: true
     });
+    const buildStart = Date.now();
     const retCode = await exec.exec('python', args, {
         cwd: 'C:\\ungoogled-chromium-windows',
         ignoreReturnCode: true
     });
+    const buildMinutes = (Date.now() - buildStart) / 60000;
+    // build.py's internal ninja timeout is 3.5h, so a stage that exits
+    // non-zero after only minutes did NOT time out - it hit a real error
+    // (clone failure, patch failure, gn failure). Without this check every
+    // such error gets checkpointed and "resumed" by the next stage, which
+    // re-fails the same way in minutes, silently burning all 24 stages
+    // (run 29987588482 lost ~4h to a depot_tools patch failure this way,
+    // with every stage reporting success). A genuine compile error later
+    // than the threshold still gets caught: the NEXT stage restores the
+    // tree, re-hits the error within minutes, and trips this. Skipping the
+    // checkpoint upload on fast-fail also keeps a broken tree from
+    // overwriting the last good checkpoint on resumed runs.
+    if (retCode !== 0 && buildMinutes < 60) {
+        core.setFailed(`build.py failed after only ${buildMinutes.toFixed(1)} minutes (exit ${retCode}) - real error, not a stage timeout. Not uploading a checkpoint.`);
+        return;
+    }
     if (retCode === 0) {
         core.setOutput('finished', true);
         const globber = await glob.create('C:\\ungoogled-chromium-windows\\build\\aerium*',
