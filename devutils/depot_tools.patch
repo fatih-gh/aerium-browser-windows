@@ -20,7 +20,7 @@ index d88a318..1892ed3 100755
 -call vpython3 "%~dp0gclient.py" %*
 +call python3 "%~dp0gclient.py" %*
 diff --git a/gclient.py b/gclient.py
-index 9e54840..e6acc3d 100755
+index 9e54840..652f5bf 100755
 --- a/gclient.py
 +++ b/gclient.py
 @@ -130,8 +130,8 @@ DEPOT_TOOLS_DIR = os.path.dirname(os.path.abspath(os.path.realpath(__file__)))
@@ -50,18 +50,20 @@ index 9e54840..e6acc3d 100755
  
              if not self._get_option("process_all_deps", False):
                  should_process = should_process and _should_process(condition)
-@@ -915,6 +917,10 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
+@@ -915,6 +917,12 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
                          merged_condition
                      )
  
-+                    if name != "src/third_party/node/node_modules" and \n                    (not name.startswith("src/build/linux/") or \n                    not f"{self._get_option('sysroot', 'None')}-sysroot" in name):
++                    if name != "src/third_party/node/node_modules" and \
++                    (not name.startswith("src/build/linux/") or \
++                    not f"{self._get_option('sysroot', 'None')}-sysroot" in name):
 +                        continue
 +                    should_process_object = True
 +                    merged_condition = 'True'
                      gcs_deps.append(
                          GcsDependency(
                              parent=self,
-@@ -1046,6 +1052,8 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
+@@ -1046,6 +1054,8 @@ class Dependency(gclient_utils.WorkItem, DependencySettings):
  
          self._gn_args_from = local_scope.get("gclient_gn_args_from")
          self._gn_args_file = local_scope.get("gclient_gn_args_file")
@@ -70,7 +72,7 @@ index 9e54840..e6acc3d 100755
          self._gn_args = local_scope.get("gclient_gn_args", [])
          # It doesn't make sense to set all of these, since setting gn_args_from
          # to another DEPS will make gclient ignore any other local gn_args*
-@@ -4572,6 +4580,7 @@ def CMDsync(parser, args):
+@@ -4572,6 +4582,7 @@ def CMDsync(parser, args):
          default=[],
          help="Specify to skip processing of a certain type of dep.",
      )
