@@ -21,6 +21,7 @@ on:
       - 'pruning.list'
       - 'patches/**'
       - 'brand/**'
+      - 'devutils/**'
       - 'ungoogled-chromium'
       - '.github/workflows/**'
       - '.github/actions/**'
